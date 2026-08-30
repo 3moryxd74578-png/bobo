@@ -5,12 +5,15 @@ on:
     - cron: "*/30 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download bot files
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -25,3 +28,11 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: python bot.py
+
+      - name: Save posted mods
+        run: |
+          git config user.name "Gummy FNF Bot"
+          git config user.email "actions@github.com"
+          git add posted.json
+          git diff --cached --quiet || git commit -m "Update posted mods"
+          git push
